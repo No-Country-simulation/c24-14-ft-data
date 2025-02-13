@@ -3,4 +3,4 @@
 ## Integrantes
 - [X] Lucel Da Silva
 - [X] Jesus Antonio Felix Robles
-- [ ] Jesus Martin Ramirez Panduro
+- [X] Jesus Martin Ramirez Panduro

@@ -2,4 +2,6 @@
 
 ## Integrantes
 - [X] Lucel Da Silva
-- [ ] Poner su nombre aquí y hacer commit para tener en cuenta presencia
+- [X] Jesus Antonio Felix Robles
+- [X] Jesus Martin Ramirez Panduro
+- [X] Bastián David López Quiroga

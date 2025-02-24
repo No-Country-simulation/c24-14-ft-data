@@ -1,0 +1,762 @@
+---
+title: Introduccion
+jupyter: python3
+---
+
+
+
+Amazon es una de las principales empresas de comercio en línea a nivel mundial. Para comprender mejor el comportamiento de los consumidores, se ha recopilado información a través de una encuesta, obteniendo datos sobre diversos aspectos de su interacción con la plataforma.
+
+El conjunto de datos incluye características demográficas de los clientes, como edad y género, así como información sobre sus hábitos de compra, las categorías de productos que prefieren, la frecuencia con la que visitan la página y las razones por las que abandonan el carrito de compras, entre otros factores.
+
+Mediante el análisis de esta información, es posible identificar patrones de comportamiento y desarrollar estrategias para optimizar la plataforma, mejorar la experiencia del usuario y aumentar la conversión de ventas.
+
+# Objetivo
+
+El objetivo principal de este análisis es identificar los factores que influyen en el abandono del carrito de compras en Amazon. Se busca determinar qué variables están relacionadas con este comportamiento y cuáles tienen un mayor impacto, con el fin de generar insights que ayuden a optimizar la plataforma y mejorar la experiencia del usuario.
+
+# Preprocesameinto y limpieza de datos
+
+```{python}
+# Importacion de librerias
+
+
+import pandas as pd
+import numpy as np
+import seaborn as sns
+from matplotlib import pyplot as plt
+```
+
+```{python}
+# Importacion de dataset
+
+
+df = pd.read_csv("C:/Users/janto/OneDrive/Documentos/No country/Amazon Customer Behavior Survey.csv")
+```
+
+```{python}
+# Vista general
+
+df.info()
+
+```
+
+```{python}
+# Editamos nombre de columna repetido
+
+columns_with_indices = list(enumerate(df.columns))
+
+# Print column names and their indices
+print("Column Names and Indices:")
+for index, col_name in columns_with_indices:
+    print(f"Index: {index}, Column Name: '{col_name}'")
+
+
+df=df.rename(columns={df.columns[17]:'Personalized_Recommendation_Frequency_2'})
+
+
+
+# Editamos espacios de nombre de columnas
+
+
+df.columns=df.columns.str.strip()
+```
+
+```{python}
+#Previsualizamos el dataset
+
+df.head()
+```
+
+```{python}
+# Ver si hay datos nulos 
+
+
+df.isna().sum()
+
+```
+
+```{python}
+
+
+print(df['Product_Search_Method'].unique())
+```
+
+```{python}
+# Checamos si hay duplicados
+
+
+df.duplicated().sum()
+```
+
+```{python}
+# Visualizamos cuantos valores unicos hay por categoria
+
+print(df.nunique())
+```
+
+# Analisis de datos
+
+## Analisis variables categoricas
+
+```{python}
+# Obtenemos las fechas del analisis de comportamiento
+
+
+df['Timestamp'] = pd.to_datetime(df['Timestamp'])
+ 
+fecha_minima = df['Timestamp'].min()
+fecha_maxima = df['Timestamp'].max()
+
+print(f'La fecha mínima de compra es {fecha_minima}')
+print(f'La fecha máxima de compra es {fecha_maxima}')
+print(f'Rango de fechas: {fecha_maxima - fecha_minima}')
+
+
+
+df['Timestamp'].hist(bins=12, figsize=(10,5))
+
+
+
+```
+
+La recoleccion de datos fue hecha aproximadamente en un rango de 11 dias
+
+```{python}
+# Dastribucion de datos por genero
+
+
+value_counts = df['Gender'].value_counts(normalize=True) * 100
+value_counts = value_counts.sort_values(ascending=True)  
+        
+        
+plt.figure(figsize=(10, len(value_counts) / 2))
+sns.barplot(x=value_counts.values, y=value_counts.index, orient='h')
+plt.title(f'Percentage Distribution of Gender')
+plt.xlabel('Percentage (%)')
+plt.ylabel(None)
+      
+        
+for i, v in enumerate(value_counts.values):
+    plt.text(v + 0.5, i, f"{v:.1f}%", color='black', va='center')
+        
+
+plt.show()
+```
+
+La mayoria de los datos recolectados de la poblacion fueron mujeres con un 58%
+
+```{python}
+# Frecuencia de compra
+
+
+value_counts = df['Purchase_Frequency'].value_counts(normalize=True) * 100
+value_counts = value_counts.sort_values(ascending=True)  
+        
+        
+plt.figure(figsize=(10, len(value_counts) / 2))
+sns.barplot(x=value_counts.values, y=value_counts.index, orient='h')
+plt.title(f'Percentage Distribution of Purchase frecuency')
+plt.xlabel('Percentage (%)')
+plt.ylabel(None)
+      
+        
+for i, v in enumerate(value_counts.values):
+    plt.text(v + 0.5, i, f"{v:.1f}%", color='black', va='center')
+        
+
+plt.show()
+```
+
+-La mayoria de los usuarios dice que compra algunas veces al mes siendo un 33.7%, 
+-20.6% menos de una vez al mes
+-18.6% Una vez a la semana
+-17.8% una vez al mes
+-9.3% multiples veces al la semana
+
+```{python}
+# Obtenemos las categorias mas populares
+
+
+purchases_by_category = df['Purchase_Categories'].value_counts()
+
+
+
+print(purchases_by_category)
+
+
+# Plot the bar chart
+purchases_by_category.plot(title='Categorias', kind='barh', xlabel='Categorias', ylabel='Number of Purchases', figsize=[10,5])
+
+# Show the plot
+plt.show()
+```
+
+
+```{python}
+# Dsitribucions de frecuencia si los usarios han hecho alguna compra basado en los recomendaciones de amazon
+
+value_counts = df['Personalized_Recommendation_Frequency'].value_counts(normalize=True) * 100
+value_counts = value_counts.sort_values(ascending=True)  
+        
+        
+plt.figure(figsize=(10, len(value_counts) / 2))
+sns.barplot(x=value_counts.values, y=value_counts.index, orient='h')
+plt.title(f'Personalized_Recommendation_Frequency')
+plt.xlabel('Percentage (%)')
+plt.ylabel(None)
+      
+        
+for i, v in enumerate(value_counts.values):
+    plt.text(v + 0.5, i, f"{v:.1f}%", color='black', va='center')
+        
+
+plt.show()
+```
+
+El 20.3% dice que si ha hecho compras basado en las recomendaciones de amazon, 38% de los usuarios dicen que a veces y 41.7% dice que no 
+
+```{python}
+#Frecuencia de navegacion
+
+
+value_counts = df['Browsing_Frequency'].value_counts(normalize=True) * 100
+value_counts = value_counts.sort_values(ascending=True)  
+        
+        
+plt.figure(figsize=(10, len(value_counts) / 2))
+sns.barplot(x=value_counts.values, y=value_counts.index, orient='h')
+plt.title(f'Browsing_Frequency')
+plt.xlabel('Percentage (%)')
+plt.ylabel(None)
+      
+        
+for i, v in enumerate(value_counts.values):
+    plt.text(v + 0.5, i, f"{v:.1f}%", color='black', va='center')
+        
+
+plt.show()
+```
+
+La mayoria de lo usarios dice que navega algunas veces por semana siendo un 41.4%, 33.1% dice que navega agunas veces por mes, y 12.8% dice que multiples veces en el dia y yambien 12.8% dice que raramente
+
+```{python}
+# Como buscas los productos?
+
+value_counts = df['Product_Search_Method'].value_counts(normalize=True) * 100
+value_counts = value_counts.sort_values(ascending=True)  
+        
+        
+plt.figure(figsize=(10, len(value_counts) / 2))
+sns.barplot(x=value_counts.values, y=value_counts.index, orient='h')
+plt.title(f'Product_Search_Method')
+plt.xlabel('Percentage (%)')
+plt.ylabel(None)
+      
+        
+for i, v in enumerate(value_counts.values):
+    plt.text(v + 0.5, i, f"{v:.1f}%", color='black', va='center')
+        
+
+plt.show()
+```
+
+37.2% de los usuarios dijo  que su metodo de busqueda era por categorias, 35.7% dijo que era por palabras clave, 21.2% dijo que eran por filtro y 6% otros
+
+```{python}
+#Busqueda en primera pagina o multiples paginas
+
+
+value_counts = df['Search_Result_Exploration'].value_counts(normalize=True) * 100
+value_counts = value_counts.sort_values(ascending=True)  
+        
+        
+plt.figure(figsize=(10, len(value_counts) / 2))
+sns.barplot(x=value_counts.values, y=value_counts.index, orient='h')
+plt.title(f'Search_Result_Exploration')
+plt.xlabel('Percentage (%)')
+plt.ylabel(None)
+      
+        
+for i, v in enumerate(value_counts.values):
+    plt.text(v + 0.5, i, f"{v:.1f}%", color='black', va='center')
+        
+
+plt.show()
+```
+
+73.4% de los usarios ddijo que tiende a navegar en multiples paginas, mientrads que el 26.6% dijo que se enfoca en la primera pagina
+
+```{python}
+# Agregas al carrito mientras naveghas
+
+value_counts = df['Add_to_Cart_Browsing'].value_counts(normalize=True) * 100
+value_counts = value_counts.sort_values(ascending=True)  
+        
+        
+plt.figure(figsize=(10, len(value_counts) / 2))
+sns.barplot(x=value_counts.values, y=value_counts.index, orient='h')
+plt.title(f'Add_to_Cart_Browsing')
+plt.xlabel('Percentage (%)')
+plt.ylabel(None)
+      
+        
+for i, v in enumerate(value_counts.values):
+    plt.text(v + 0.5, i, f"{v:.1f}%", color='black', va='center')
+        
+
+plt.show()
+```
+
+41.2% de usuarios dijo que tal vez agregaba al carrito mientras navegaba,  35.9% dijo que si y 22.9% dijo que no
+
+```{python}
+# Que tan seguido se completa la compra despeus de agregar ala carrito
+
+
+value_counts = df['Cart_Completion_Frequency'].value_counts(normalize=True) * 100
+value_counts = value_counts.sort_values(ascending=True)  
+        
+        
+plt.figure(figsize=(10, len(value_counts) / 2))
+sns.barplot(x=value_counts.values, y=value_counts.index, orient='h')
+plt.title(f'Cart_Completion_Frequency')
+plt.xlabel('Percentage (%)')
+plt.ylabel(None)
+      
+        
+for i, v in enumerate(value_counts.values):
+    plt.text(v + 0.5, i, f"{v:.1f}%", color='black', va='center')
+        
+
+plt.show()
+
+```
+
+
+```{python}
+# Example: Frequency distribution of Cart_Abandonment_Factors
+value_counts = df['Cart_Abandonment_Factors'].value_counts(normalize=True) * 100
+value_counts = value_counts.sort_values(ascending=True)  
+        
+        
+plt.figure(figsize=(10, len(value_counts) / 2))
+sns.barplot(x=value_counts.values, y=value_counts.index, orient='h')
+plt.title(f'Cart_Abandonment_Factors')
+plt.xlabel('Percentage (%)')
+plt.ylabel(None)
+      
+        
+for i, v in enumerate(value_counts.values):
+    plt.text(v + 0.5, i, f"{v:.1f}%", color='black', va='center')
+        
+
+plt.show()
+```
+
+```{python}
+# Frecuencia del uso de funcion save for later
+
+value_counts = df['Saveforlater_Frequency'].value_counts(normalize=True) * 100
+value_counts = value_counts.sort_values(ascending=True)  
+        
+        
+plt.figure(figsize=(10, len(value_counts) / 2))
+sns.barplot(x=value_counts.values, y=value_counts.index, orient='h')
+plt.title(f'Saveforlater_Frequency')
+plt.xlabel('Percentage (%)')
+plt.ylabel(None)
+      
+        
+for i, v in enumerate(value_counts.values):
+    plt.text(v + 0.5, i, f"{v:.1f}%", color='black', va='center')
+        
+
+plt.show()
+```
+
+```{python}
+# Resena hecha
+
+value_counts = df['Review_Left'].value_counts(normalize=True) * 100
+value_counts = value_counts.sort_values(ascending=True)  
+        
+        
+plt.figure(figsize=(10, len(value_counts) / 2))
+sns.barplot(x=value_counts.values, y=value_counts.index, orient='h')
+plt.title(f'Review_Left')
+plt.xlabel('Percentage (%)')
+plt.ylabel(None)
+      
+        
+for i, v in enumerate(value_counts.values):
+    plt.text(v + 0.5, i, f"{v:.1f}%", color='black', va='center')
+        
+
+plt.show()
+```
+
+```{python}
+# Confianza en las resenas al hacer compra
+
+
+
+value_counts = df['Review_Reliability'].value_counts(normalize=True) * 100
+value_counts = value_counts.sort_values(ascending=True)  
+        
+        
+plt.figure(figsize=(10, len(value_counts) / 2))
+sns.barplot(x=value_counts.values, y=value_counts.index, orient='h')
+plt.title(f'Review_Reliability')
+plt.xlabel('Percentage (%)')
+plt.ylabel(None)
+      
+        
+for i, v in enumerate(value_counts.values):
+    plt.text(v + 0.5, i, f"{v:.1f}%", color='black', va='center')
+        
+
+plt.show()
+```
+
+```{python}
+# Las resenas de otors clientes son utiles?
+
+
+value_counts = df['Review_Helpfulness'].value_counts(normalize=True) * 100
+value_counts = value_counts.sort_values(ascending=True)  
+        
+        
+plt.figure(figsize=(10, len(value_counts) / 2))
+sns.barplot(x=value_counts.values, y=value_counts.index, orient='h')
+plt.title(f'Review_Helpfulness')
+plt.xlabel('Percentage (%)')
+plt.ylabel(None)
+      
+        
+for i, v in enumerate(value_counts.values):
+    plt.text(v + 0.5, i, f"{v:.1f}%", color='black', va='center')
+        
+
+plt.show()
+```
+
+```{python}
+# Recomendaciones utiles
+
+
+
+value_counts = df['Recommendation_Helpfulness'].value_counts(normalize=True) * 100
+value_counts = value_counts.sort_values(ascending=True)  
+        
+        
+plt.figure(figsize=(10, len(value_counts) / 2))
+sns.barplot(x=value_counts.values, y=value_counts.index, orient='h')
+plt.title(f'Recommendation_Helpfulness')
+plt.xlabel('Percentage (%)')
+plt.ylabel(None)
+      
+        
+for i, v in enumerate(value_counts.values):
+    plt.text(v + 0.5, i, f"{v:.1f}%", color='black', va='center')
+        
+
+plt.show()
+```
+
+```{python}
+# Aspectos de servicio que mas se valoran
+
+
+value_counts = df['Service_Appreciation'].value_counts(normalize=True) * 100
+value_counts = value_counts.sort_values(ascending=True)  
+        
+        
+plt.figure(figsize=(10, len(value_counts) / 2))
+sns.barplot(x=value_counts.values, y=value_counts.index, orient='h')
+plt.title(f'Service_Appreciation')
+plt.xlabel('Percentage (%)')
+plt.ylabel(None)
+      
+        
+for i, v in enumerate(value_counts.values):
+    plt.text(v + 0.5, i, f"{v:.1f}%", color='black', va='center')
+        
+
+plt.show()
+```
+
+```{python}
+# Areas a mejorar
+
+
+value_counts = df['Improvement_Areas'].value_counts(normalize=True) * 100
+value_counts = value_counts.sort_values(ascending=True)  
+        
+        
+plt.figure(figsize=(10, len(value_counts) / 2))
+sns.barplot(x=value_counts.values, y=value_counts.index, orient='h')
+plt.title(f'Improvement_Areas')
+plt.xlabel('Percentage (%)')
+plt.ylabel(None)
+      
+        
+for i, v in enumerate(value_counts.values):
+    plt.text(v + 0.5, i, f"{v:.1f}%", color='black', va='center')
+        
+
+plt.show()
+```
+
+```{python}
+df.head()
+```
+
+```{python}
+pd.crosstab(df.Gender, df.Browsing_Frequency,  normalize=True)
+```
+
+```{python}
+pd.crosstab([df.Gender,df.Search_Result_Exploration], [df.Browsing_Frequency, df.Product_Search_Method],  margins=True)
+
+
+
+## https://www.youtube.com/watch?v=I_kUj-MfYys
+```
+
+```{python}
+pd.crosstab([df.Gender,df.Search_Result_Exploration], [df.Browsing_Frequency, df.Product_Search_Method],  normalize=True)
+```
+
+## Analisis variables numericas
+
+```{python}
+# Obtenemos las columnas de tipo numerico y realizamos estadisticas generales
+
+df_numerical_values = df.select_dtypes(include=['int64'])
+
+df_numerical_values.describe()
+```
+
+```{python}
+df_numerical_values.head()
+```
+
+```{python}
+# Obtenemos histogramas de las estadisticas numericas generales
+
+
+df_numerical_values.hist(figsize=(15, 10))
+```
+
+```{python}
+correlation = df_numerical_values.corr()
+plt.figure(figsize=(10,10))
+sns.heatmap(correlation,annot=True, cmap='coolwarm', linewidths=0.5)
+plt.title('Correlation matrix')
+plt.show()
+```
+
+# Analisis objetivo: Factores abandono de carrito
+
+```{python}
+# Impreimimos los factores unicos de abandono 
+
+print(df['Cart_Abandonment_Factors'].unique())
+```
+
+```{python}
+factor_counts = df['Cart_Abandonment_Factors'].value_counts()
+
+# Step 2: Sort the factors in descending order
+factor_counts = factor_counts.sort_values(ascending=False)
+
+percentage_per_value = df['Cart_Abandonment_Factors'].value_counts(normalize=True) * 100
+
+print(percentage_per_value)
+
+
+value_counts = df['Cart_Abandonment_Factors'].value_counts(normalize=True) * 100
+value_counts = value_counts.sort_values(ascending=True)  
+        
+        
+plt.figure(figsize=(10, len(value_counts) / 2))
+sns.barplot(x=value_counts.values, y=value_counts.index, orient='h')
+plt.title(f'Cart_Abandonment_Factors')
+plt.xlabel('Percentage (%)')
+plt.ylabel(None)
+      
+        
+for i, v in enumerate(value_counts.values):
+    plt.text(v + 0.5, i, f"{v:.1f}%", color='black', va='center')
+        
+
+plt.show()
+
+# Step 3: Calculate the cumulative percentage
+cumulative_percentage = np.cumsum(factor_counts) / np.sum(factor_counts) * 100
+
+
+# Step 4: Plot the Pareto chart
+fig, ax1 = plt.subplots(figsize=(15,6))
+
+# Bar plot for the frequencies
+ax1.bar(factor_counts.index, factor_counts, color='b')
+ax1.set_xlabel(None)
+ax1.set_ylabel('Frequency', color='b')
+ax1.tick_params(axis='y', labelcolor='b')
+
+# Line plot for the cumulative percentage
+ax2 = ax1.twinx()
+ax2.plot(factor_counts.index, cumulative_percentage, color='r', marker='o')
+ax2.set_ylabel('Cumulative Percentage', color='r')
+ax2.tick_params(axis='y', labelcolor='r')
+
+# Rotate x-axis labels for better readability
+plt.xticks(rotation=45, ha='right')
+
+# Display the chart
+plt.title('Pareto Chart of Cart Abandonment Factors')
+plt.show()
+```
+
+En el primer grafico de barras los factores de abandono de carrito podemos ver que los que mas sobresalen son que se encontro un mejor precio con un 42% y que mejor se cambia de opinion o ya no necesita mas el articulo con un 40% mientras que los otras dos categorias como la de alto costo de envio y otros representan el 11% y 5% respectivamente.
+
+Despues de eso se hace un pareto para saber cules son los principales factores que se tendrian que analizar, que en este caso serian 'Se encontro un mejor precio en otro lugar y 'Se cambio de opinion o no necesita mas el articulo' pues son las que mas efectos tienen al abandono
+
+```{python}
+# Hacemo un box plot de los factores de abandono vs edad
+
+categoria_abandono = ['Found a better price elsewhere','Changed my mind or no longer need the item']
+
+
+
+
+
+for categoria in categoria_abandono:
+    filtered_df = df[df['Cart_Abandonment_Factors'] == categoria]  # Filter DataFrame for the current console
+    descripcion = filtered_df['age'].describe() 
+    print(f"Cart_Abandonment_Factors: {categoria}")
+    print(descripcion)
+
+
+
+
+filtered_df = df[df['Cart_Abandonment_Factors'].isin(categoria_abandono)]
+
+
+plt.figure(figsize=(10,8))
+sns.boxplot(x = 'Cart_Abandonment_Factors', y = 'age', data=filtered_df)
+
+```
+
+Eliminar valores atipicos(gente menor de edad)
+
+-Su hijo le comopro
+-Posible typo
+
+```{python}
+#Factores de abandono vs importancia de resenas de cliente
+
+
+categoria_abandono = ['Found a better price elsewhere','Changed my mind or no longer need the item']
+
+
+
+
+
+for categoria in categoria_abandono:
+    filtered_df = df[df['Cart_Abandonment_Factors'] == categoria]  # Filter DataFrame for the current console
+    descripcion = filtered_df['Customer_Reviews_Importance'].describe() 
+    print(f"Cart_Abandonment_Factors: {categoria}")
+    print(descripcion)
+
+
+
+
+filtered_df = df[df['Cart_Abandonment_Factors'].isin(categoria_abandono)]
+
+
+plt.figure(figsize=(10,8))
+sns.boxplot(x = 'Cart_Abandonment_Factors', y = 'Customer_Reviews_Importance', data=filtered_df)
+
+```
+
+```{python}
+#Factores de abandono vs Que tan seguido se recibe recomendaciones personalizadas
+
+
+categoria_abandono = ['Found a better price elsewhere','Changed my mind or no longer need the item']
+
+
+
+
+
+for categoria in categoria_abandono:
+    filtered_df = df[df['Cart_Abandonment_Factors'] == categoria]  # Filter DataFrame for the current console
+    descripcion = filtered_df['Personalized_Recommendation_Frequency_2'].describe() 
+    print(f"Cart_Abandonment_Factors: {categoria}")
+    print(descripcion)
+
+
+
+
+filtered_df = df[df['Cart_Abandonment_Factors'].isin(categoria_abandono)]
+
+
+plt.figure(figsize=(10,8))
+sns.boxplot(x = 'Cart_Abandonment_Factors', y = 'Personalized_Recommendation_Frequency_2', data=filtered_df)
+```
+
+```{python}
+#Factores de abandono vs Que tan seguido se recibe recomendaciones personalizadas
+
+
+categoria_abandono = ['Found a better price elsewhere','Changed my mind or no longer need the item']
+
+
+
+
+
+for categoria in categoria_abandono:
+    filtered_df = df[df['Cart_Abandonment_Factors'] == categoria]  
+    descripcion = filtered_df['Rating_Accuracy'].describe() 
+    print(f"Cart_Abandonment_Factors: {categoria}")
+    print(descripcion)
+
+
+
+
+filtered_df = df[df['Cart_Abandonment_Factors'].isin(categoria_abandono)]
+
+
+plt.figure(figsize=(10,8))
+sns.boxplot(x = 'Cart_Abandonment_Factors', y = 'Rating_Accuracy', data=filtered_df)
+```
+
+```{python}
+#Factores de abandono vs Satisfaction de la compra
+
+
+categoria_abandono = ['Found a better price elsewhere','Changed my mind or no longer need the item']
+
+
+
+
+
+for categoria in categoria_abandono:
+    filtered_df = df[df['Cart_Abandonment_Factors'] == categoria]  
+    descripcion = filtered_df['Shopping_Satisfaction'].describe() 
+    print(f"Cart_Abandonment_Factors: {categoria}")
+    print(descripcion)
+
+
+
+
+filtered_df = df[df['Cart_Abandonment_Factors'].isin(categoria_abandono)]
+
+
+plt.figure(figsize=(10,8))
+sns.boxplot(x = 'Cart_Abandonment_Factors', y = 'Shopping_Satisfaction', data=filtered_df)
+```
+

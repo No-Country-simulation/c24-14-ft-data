@@ -680,6 +680,8 @@ filtered_df = df[df['Cart_Abandonment_Factors'].isin(categoria_abandono)]
 plt.figure(figsize=(10,8))
 sns.boxplot(x = 'Cart_Abandonment_Factors', y = 'Customer_Reviews_Importance', data=filtered_df)
 
+
+#
 ```
 
 ```{python}

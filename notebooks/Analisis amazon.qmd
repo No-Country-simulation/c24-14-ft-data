@@ -41,6 +41,8 @@ df.info()
 
 ```
 
+Se ve que se tiene dos columnas con el mismo nombre 'Personalized_Recommendation_Frequency' Es asi que decidimos cambiar el nombre de una para poder diferenciarlas entre si, incluso nos percatamos que una de ellas tenia un espacio demas'
+
 ```{python}
 # Editamos nombre de columna repetido
 
@@ -61,6 +63,8 @@ df=df.rename(columns={df.columns[17]:'Personalized_Recommendation_Frequency_2'})
 
 df.columns=df.columns.str.strip()
 ```
+
+Aqui modificamos el nombre de unas de las columnas y eliminamos espacios innecesarios en los nombres
 
 ```{python}
 #Previsualizamos el dataset
@@ -95,9 +99,61 @@ df.duplicated().sum()
 print(df.nunique())
 ```
 
+```{python}
+# Vemos una descripcion general de los datos
+
+df.describe()
+```
+
+Vemos que dentro de nustros datos hay personas menores de edad, habiendo edades de hasta 3 anos,para tener una cuenta en amazon se debe de tener por lo menos 13 anos, es asi que procederemos a ver cuenta gente hay de esta edad
+
+```{python}
+# Vemos cuanto gente menor de edad hay
+
+
+edades = df['age'].value_counts().sort_index()
+
+
+
+menores = edades[edades.index < 13]
+
+print(menores)
+
+print(f'El total de menores de edad son {menores.sum()}')
+```
+
+```{python}
+sns.boxplot(y=df['age'])
+
+
+```
+
+Como se puede observar en total hay 2  menores a 13 anos de edad, prodederemos a eliminar estas filas, esto no afectara estadisticamente nuestros datos ya que son solo 2 filas de 600 las que eliminaremos
+
+```{python}
+ df = df[df['age'] >= 13]
+
+
+
+df.describe()
+
+```
+
+```{python}
+sns.boxplot(y=df['age'])
+```
+
+Como podemos ver, al eliminar a los menores a 13 de edad, ya no hay valores atípicos por debajo del primer cuartil en nuestro boxplot. Incluso si comparamos la media y la desviación estándar después de eliminar a los menores de edad con los valores originales, prácticamente se mantienen iguales: la media pasa de 30.79 a 30.868, y la desviación estándar de 10.19 a 10.117556, respectivamente.
+
+```{python}
+df.head()
+```
+
 # Analisis de datos
 
 ## Analisis variables categoricas
+
+En esta secciion analizaremos los datos de las variables categoricas para tener una estadistica general lo que se recolectó
 
 ```{python}
 # Obtenemos las fechas del analisis de comportamiento
@@ -120,7 +176,7 @@ df['Timestamp'].hist(bins=12, figsize=(10,5))
 
 ```
 
-La recoleccion de datos fue hecha aproximadamente en un rango de 11 dias
+La recolección de datos fue hecha aproximadamente en un rango de 11 dias
 
 ```{python}
 # Dastribucion de datos por genero
@@ -191,6 +247,8 @@ purchases_by_category.plot(title='Categorias', kind='barh', xlabel='Categorias',
 # Show the plot
 plt.show()
 ```
+
+Como podemos ver tenemos alrededor de 29 categorias 
 
 
 ```{python}
@@ -529,6 +587,8 @@ pd.crosstab([df.Gender,df.Search_Result_Exploration], [df.Browsing_Frequency, df
 ```
 
 ## Analisis variables numericas
+
+En esta sección analizaremos las variables numericas que se tienen en el data set para tener una estadistica descriptiva de la recolección de datos
 
 ```{python}
 # Obtenemos las columnas de tipo numerico y realizamos estadisticas generales

@@ -3,7 +3,9 @@ title: Introduccion
 jupyter: python3
 ---
 
-
+```{python}
+!pip install -r ../requirements.txt
+```
 
 Amazon es una de las principales empresas de comercio en línea a nivel mundial. Para comprender mejor el comportamiento de los consumidores, se ha recopilado información a través de una encuesta, obteniendo datos sobre diversos aspectos de su interacción con la plataforma.
 
@@ -31,7 +33,25 @@ from matplotlib import pyplot as plt
 # Importacion de dataset
 
 
-df = pd.read_csv("C:/Users/janto/OneDrive/Documentos/No country/Amazon Customer Behavior Survey.csv")
+#df = pd.read_csv("C:/Users/janto/OneDrive/Documentos/No country/Amazon Customer Behavior Survey.csv")
+from typing import Final
+import os
+import kagglehub
+
+
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_rows', None)
+
+kaggle_path = (
+    kagglehub.dataset_download(
+        "swathiunnikrishnan/amazon-consumer-behaviour-dataset"
+    )
+)
+
+PATH: Final = os.path.join(kaggle_path, 'Amazon Customer Behavior Survey.csv')
+
+df = pd.read_csv(PATH)
+df['id'] = df.index + 1
 ```
 
 ```{python}
@@ -131,9 +151,7 @@ sns.boxplot(y=df['age'])
 Como se puede observar en total hay 2  menores a 13 anos de edad, prodederemos a eliminar estas filas, esto no afectara estadisticamente nuestros datos ya que son solo 2 filas de 600 las que eliminaremos
 
 ```{python}
- df = df[df['age'] >= 13]
-
-
+df = df[df['age'] >= 13]
 
 df.describe()
 
@@ -157,7 +175,7 @@ En esta secciion analizaremos los datos de las variables categoricas para tener 
 
 ```{python}
 # Obtenemos las fechas del analisis de comportamiento
-
+"""
 
 df['Timestamp'] = pd.to_datetime(df['Timestamp'])
  
@@ -170,10 +188,7 @@ print(f'Rango de fechas: {fecha_maxima - fecha_minima}')
 
 
 
-df['Timestamp'].hist(bins=12, figsize=(10,5))
-
-
-
+df['Timestamp'].hist(bins=12, figsize=(10,5))"""
 ```
 
 La recolección de datos fue hecha aproximadamente en un rango de 11 dias
@@ -247,9 +262,275 @@ purchases_by_category.plot(title='Categorias', kind='barh', xlabel='Categorias',
 # Show the plot
 plt.show()
 ```
+Como podemos ver tenemos alrededor de 29 categorias (?
 
-Como podemos ver tenemos alrededor de 29 categorias 
+```{python}
+total_registros = len(df)
+df_copy = df.copy()
+df_copy['Purchase_Categories'] = df_copy['Purchase_Categories'].str.split(';')
 
+df_copy = df_copy.explode('Purchase_Categories').reset_index(drop=True)
+
+from matplotlib.patches import FancyBboxPatch
+
+
+category_counts = df_copy['Purchase_Categories'].value_counts()
+
+colors_top_five = ['#0072f0', '#0072f0', '#0072f0', '#0072f0', '#0072f0']
+
+title_text: str = 'Preferencia de compras'
+
+
+plt.figure(figsize=(6, 4))
+
+
+ax = sns.barplot(
+    x=category_counts.values,
+    y=category_counts.index, orient='h',
+    joinstyle='bevel'
+)
+
+
+new_patches = []
+for patch, color, deck, total, in zip(
+    ax.patches, colors_top_five,
+    category_counts.values, category_counts.values
+):
+
+    bb = patch.get_bbox()
+    p_bbox = FancyBboxPatch(
+        (bb.xmin, bb.ymin), abs(bb.width), abs(bb.height),
+        boxstyle='round,pad=-0.05,rounding_size=0.73',
+        ec='none', fc=color, mutation_aspect=0.73
+    )
+    patch.remove()
+    new_patches.append(p_bbox)
+
+    ax.annotate(
+        f'{(deck*100/total_registros):.0f}%', xy=(40, patch.get_y() + patch.get_height()/2),
+        xytext=(-5,0), textcoords='offset points',
+        arrowprops=dict(arrowstyle='-', color='none'),
+        color='white', fontweight='bold', fontsize=12, ha='right', va='center',
+        xycoords='data',
+        bbox=dict(facecolor='none', edgecolor='none', pad=0),
+        annotation_clip=False
+    )
+
+    ax.annotate(
+        f'{total}',
+        xy=(patch.get_width(), patch.get_y() + patch.get_height()/2),
+        xytext=(-5,0), textcoords='offset points',
+        arrowprops=dict(arrowstyle='-', color='none'),
+        color='white', fontweight='bold', fontsize=12, ha='right', va='center',
+        xycoords='data',
+        bbox=dict(facecolor='none', edgecolor='none', pad=0),
+        annotation_clip=False
+    )
+
+for patch in new_patches:
+    ax.add_patch(patch)
+
+ax.set_xlabel('')
+ax.set_ylabel('')
+ax.set_xticks([])
+ax.yaxis.grid(False)
+ax.xaxis.grid(False)
+ax.spines['bottom'].set_visible(False)
+ax.spines['left'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['top'].set_visible(False)
+
+plt.title(
+    title_text,
+    fontsize=18, fontweight='bold', x=0.35
+)
+
+ax.text(
+    0.98, 0.02, f'{total_registros}\nRegistros totales',
+    ha='right', va='bottom', transform=ax.transAxes,
+    fontsize=12, fontweight='bold'
+)
+
+plt.show()
+```
+
+```{python}
+df['Purchase_Categories'] = df['Purchase_Categories'].str.split(';')
+df = df.explode('Purchase_Categories').reset_index(drop=True)
+
+df_dummies = pd.get_dummies(df['Purchase_Categories'])
+#df_combined = df.join(df_dummies).groupby('Timestamp').max().reset_index()
+df_combined = df.join(df_dummies).groupby('id').max().reset_index()
+df_dummies = pd.get_dummies(df['Purchase_Categories'])
+#df_combined = df.join(df_dummies).groupby('Timestamp').max().reset_index()
+df_combined = df.join(df_dummies).groupby('id').max().reset_index()
+df_combined.sample(2)
+```
+```{python}
+from matplotlib.ticker import FuncFormatter
+from matplotlib.font_manager import fontManager, FontProperties
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+from matplotlib_venn import venn3
+
+
+df_filtered = df_combined[['id'] + df_combined.columns[-5:].tolist()]
+def comunidad(server: str, df: pd.DataFrame=df_filtered):
+    '''
+        Para filtrar sus usuarios únicos de cada comunidad
+    '''
+    return df.query(f'`{server}` == True')['id'].drop_duplicates()
+```
+
+```{python}
+comunidad_list_top_three = category_counts.index[:3].tolist()
+
+
+comunity_top_one = comunidad(comunidad_list_top_three[0])
+comunity_top_two = comunidad(comunidad_list_top_three[1])
+comunity_top_three = comunidad(comunidad_list_top_three[2])
+
+set_top_one = set(comunity_top_one)
+set_top_two = set(comunity_top_two)
+set_top_three = set(comunity_top_three)
+
+# Calcular los tamaños de los conjuntos
+size_100 = len(set_top_one - (set_top_two | set_top_three))
+size_010 = len(set_top_two - (set_top_one | set_top_three))
+size_001 = len(set_top_three - (set_top_one | set_top_two))
+size_110 = len((set_top_one & set_top_two) - set_top_three)
+size_101 = len((set_top_one & set_top_three) - set_top_two)
+size_011 = len((set_top_two & set_top_three) - set_top_one)
+size_111 = len(set_top_one & set_top_two & set_top_three)
+
+# Calcular los porcentajes
+total = sum(
+    [size_100, size_010, size_001, size_110, size_101, size_011, size_111]
+)
+
+percent_100 = (size_100 / total_registros) * 100
+percent_010 = (size_010 / total_registros) * 100
+percent_001 = (size_001 / total_registros) * 100
+percent_110 = (size_110 / total_registros) * 100
+percent_101 = (size_101 / total_registros) * 100
+percent_011 = (size_011 / total_registros) * 100
+percent_111 = (size_111 / total_registros) * 100
+
+ids_sum: int = int(df_filtered.id.drop_duplicates().count())
+
+count_com = [total, int(ids_sum - total)]
+labels_com = "Están en\nlas más \nsolicitadas", "No están\nen las más\nsolicitadas"
+pastel_colors = ['#4995e8', '#BDFCFE']
+
+title_text: str = "Relación de categorías de compra"
+
+fig, ax = plt.subplots(figsize=(10, 8))
+
+wedges, texts, autotexts = ax.pie(
+    count_com, labels=labels_com, autopct="%1.1f%%",
+    colors=pastel_colors,
+    wedgeprops={'edgecolor': 'white', 'linewidth': 1, 'linestyle': 'solid'},
+    pctdistance=0.75,
+    textprops={'fontsize': 22}
+)
+
+centre_circle = plt.Circle((0, 0), 0.4, fc='white')
+ax.add_artist(centre_circle)
+
+ax.text(0, 0, f'{ids_sum}\ncompradores', ha='center', va='center', fontsize=21)
+
+ax.set_title(
+    title_text,
+    fontsize=28,
+    fontweight="bold"
+)
+
+plt.show()
+```
+
+
+```{python}
+fig, ax = plt.subplots(figsize=(10, 8))
+
+venn = venn3(
+    [set_top_one, set_top_two, set_top_three],
+    set_labels=(
+        comunidad_list_top_three[0],
+        comunidad_list_top_three[1],
+        comunidad_list_top_three[2]
+    )
+)
+
+venn.get_label_by_id('100').set_text(
+    f"{size_100}\n{percent_100:.2f}%")
+venn.get_label_by_id('010').set_text(
+    f"{size_010}\n{percent_010:.2f}%")
+venn.get_label_by_id('001').set_text(
+    f"{size_001}\n{percent_001:.2f}%")
+venn.get_label_by_id('110').set_text(
+    f"{size_110}\n{percent_110:.2f}%")
+venn.get_label_by_id('101').set_text(
+    f"{size_101}\n{percent_101:.2f}%")
+venn.get_label_by_id('011').set_text(
+    f"{size_011}\n{percent_011:.2f}%")
+venn.get_label_by_id('111').set_text(
+    f"{size_111}\n{percent_111:.2f}%")
+
+
+colors = sns.color_palette('Set3', 7)
+for patch, color in zip(venn.patches, colors):
+    patch.set_facecolor(color)
+
+
+for label in venn.set_labels:
+    label.set_fontsize(20)
+
+for label in venn.subset_labels:
+    if label:
+        label.set_fontsize(16)
+
+ax.set_title(
+    'Gráfico de Venn',
+    fontsize=28,
+    fontweight="bold"
+)
+
+plt.show()
+```
+
+```{python}
+fig, ax = plt.subplots(figsize=(10, 8))
+
+
+unique_server = size_100 + size_010 + size_001
+two_communities = size_110 + size_101 + size_011
+
+count_duelists = [unique_server, two_communities, size_111]
+labels = "Una\nsola", "En dos", "Están\nen\nlas 3"
+pastel_colors = ['#92c6ff', '#ffb7ce', '#b7e3cc']
+
+
+wedges, texts, autotexts = ax.pie(
+    count_duelists, labels=labels, autopct="%1.1f%%",
+    colors=pastel_colors,
+    wedgeprops={'edgecolor': 'white', 'linewidth': 1, 'linestyle': 'solid'},
+    pctdistance=0.75,
+    textprops={'fontsize': 20}
+)
+
+centre_circle = plt.Circle((0, 0), 0.4, fc='white')
+ax.add_artist(centre_circle)
+
+ax.text(0, 0, f'{total}\ncompradores', ha='center', va='center', fontsize=21)
+
+ax.set_title(
+    'De las 3, en cuántas\ncategorías de compras están',
+    fontsize=24,
+    fontweight="bold"
+)
+
+
+plt.show()
+```
 
 ```{python}
 # Dsitribucions de frecuencia si los usarios han hecho alguna compra basado en los recomendaciones de amazon
@@ -821,4 +1102,3 @@ filtered_df = df[df['Cart_Abandonment_Factors'].isin(categoria_abandono)]
 plt.figure(figsize=(10,8))
 sns.boxplot(x = 'Cart_Abandonment_Factors', y = 'Shopping_Satisfaction', data=filtered_df)
 ```
-

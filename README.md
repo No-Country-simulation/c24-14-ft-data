@@ -3,7 +3,7 @@
 
 [![Quarto](https://img.shields.io/badge/Quarto-1.6+-00BFAE?style=for-the-badge&logo=quarto&logoColor=white&labelColor=101010)](https://quarto.org)
 [![Python](https://img.shields.io/badge/Python-3.11+-yellow?style=for-the-badge&logo=python&logoColor=white&labelColor=101010)](https://python.org)
-[![Looker Studio](https://img.shields.io/badge/LookerStudio-25+-blue?style=for-the-badge&logo=looker&logoColor=white&labelColor=101010)](https://lookerstudio.google.com/)
+[![Looker Studio](https://img.shields.io/badge/Looker%20Studio-25+-blue?style=for-the-badge&logo=looker&logoColor=white&labelColor=101010)](https://lookerstudio.google.com/)
 
 Amazon es una de las principales empresas de comercio en línea a nivel mundial. Para comprender mejor el comportamiento de los consumidores, se ha recopilado información a través de una encuesta, obteniendo datos sobre diversos aspectos de su interacción con la plataforma.
 

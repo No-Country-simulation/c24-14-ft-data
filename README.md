@@ -1,5 +1,5 @@
 # c24-14-ft-data
-# Analisis comportamiento de usuarios de amazon
+# Proyecto analisis comportamiento de usuarios de amazon
 
 Amazon es una de las principales empresas de comercio en línea a nivel mundial. Para comprender mejor el comportamiento de los consumidores, se ha recopilado información a través de una encuesta, obteniendo datos sobre diversos aspectos de su interacción con la plataforma.
 

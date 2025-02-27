@@ -58,7 +58,6 @@ df['id'] = df.index + 1
 # Vista general
 
 df.info()
-
 ```
 
 Se ve que se tiene dos columnas con el mismo nombre 'Personalized_Recommendation_Frequency' Es asi que decidimos cambiar el nombre de una para poder diferenciarlas entre si, incluso nos percatamos que una de ellas tenia un espacio demas'
@@ -97,12 +96,9 @@ df.head()
 
 
 df.isna().sum()
-
 ```
 
 ```{python}
-
-
 print(df['Product_Search_Method'].unique())
 ```
 
@@ -144,8 +140,6 @@ print(f'El total de menores de edad son {menores.sum()}')
 
 ```{python}
 sns.boxplot(y=df['age'])
-
-
 ```
 
 Como se puede observar en total hay 2  menores a 13 anos de edad, prodederemos a eliminar estas filas, esto no afectara estadisticamente nuestros datos ya que son solo 2 filas de 600 las que eliminaremos
@@ -154,7 +148,6 @@ Como se puede observar en total hay 2  menores a 13 anos de edad, prodederemos a
 df = df[df['age'] >= 13]
 
 df.describe()
-
 ```
 
 ```{python}
@@ -262,6 +255,7 @@ purchases_by_category.plot(title='Categorias', kind='barh', xlabel='Categorias',
 # Show the plot
 plt.show()
 ```
+
 Como podemos ver tenemos alrededor de 29 categorias (?
 
 ```{python}
@@ -366,6 +360,7 @@ df_dummies = pd.get_dummies(df['Purchase_Categories'])
 df_combined = df.join(df_dummies).groupby('id').max().reset_index()
 df_combined.sample(2)
 ```
+
 ```{python}
 from matplotlib.ticker import FuncFormatter
 from matplotlib.font_manager import fontManager, FontProperties
@@ -446,7 +441,6 @@ ax.set_title(
 
 plt.show()
 ```
-
 
 ```{python}
 fig, ax = plt.subplots(figsize=(10, 8))
@@ -669,9 +663,7 @@ for i, v in enumerate(value_counts.values):
         
 
 plt.show()
-
 ```
-
 
 ```{python}
 # Example: Frequency distribution of Cart_Abandonment_Factors
@@ -988,7 +980,6 @@ filtered_df = df[df['Cart_Abandonment_Factors'].isin(categoria_abandono)]
 
 plt.figure(figsize=(10,8))
 sns.boxplot(x = 'Cart_Abandonment_Factors', y = 'age', data=filtered_df)
-
 ```
 
 Eliminar valores atipicos(gente menor de edad)
@@ -1102,3 +1093,4 @@ filtered_df = df[df['Cart_Abandonment_Factors'].isin(categoria_abandono)]
 plt.figure(figsize=(10,8))
 sns.boxplot(x = 'Cart_Abandonment_Factors', y = 'Shopping_Satisfaction', data=filtered_df)
 ```
+

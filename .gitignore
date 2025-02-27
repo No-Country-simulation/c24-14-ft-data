@@ -73,7 +73,6 @@ cover/
 *.mo
 *.pot
 *.json
-*.csv
 *.xls
 *.xlsx
 docs/_build/

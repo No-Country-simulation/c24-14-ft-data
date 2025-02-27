@@ -1,11 +1,17 @@
 ---
-title: Introduccion
+title: "Comportamiento de usuarios de Amazon"
 jupyter: python3
+lang: "es"
+execute:
+  echo: false
+  output: false
 ---
 
 ```{python}
 !pip install -r ../requirements.txt
 ```
+
+# Introducción
 
 Amazon es una de las principales empresas de comercio en línea a nivel mundial. Para comprender mejor el comportamiento de los consumidores, se ha recopilado información a través de una encuesta, obteniendo datos sobre diversos aspectos de su interacción con la plataforma.
 
@@ -27,9 +33,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 from matplotlib import pyplot as plt
-```
 
-```{python}
 # Importacion de dataset
 
 
@@ -60,7 +64,7 @@ df['id'] = df.index + 1
 df.info()
 ```
 
-Se ve que se tiene dos columnas con el mismo nombre 'Personalized_Recommendation_Frequency' Es asi que decidimos cambiar el nombre de una para poder diferenciarlas entre si, incluso nos percatamos que una de ellas tenia un espacio demas'
+Se ve que se tiene dos columnas con el mismo nombre `Personalized_Recommendation_Frequency`. Es así que decidimos cambiar el nombre de una para poder diferenciarlas entre si, incluso nos percatamos que una de ellas tenía un espacio de más
 
 ```{python}
 # Editamos nombre de columna repetido
@@ -83,7 +87,7 @@ df=df.rename(columns={df.columns[17]:'Personalized_Recommendation_Frequency_2'})
 df.columns=df.columns.str.strip()
 ```
 
-Aqui modificamos el nombre de unas de las columnas y eliminamos espacios innecesarios en los nombres
+Aquí modificamos el nombre de unas de las columnas y eliminamos espacios innecesarios en los nombres
 
 ```{python}
 #Previsualizamos el dataset
@@ -121,7 +125,7 @@ print(df.nunique())
 df.describe()
 ```
 
-Vemos que dentro de nustros datos hay personas menores de edad, habiendo edades de hasta 3 anos,para tener una cuenta en amazon se debe de tener por lo menos 13 anos, es asi que procederemos a ver cuenta gente hay de esta edad
+Vemos que dentro de nustros datos hay personas menores de edad, habiendo edades de hasta 3 años,para tener una cuenta en amazon se debe de tener por lo menos 13 años, es asi que procederemos a ver cuenta gente hay de esta edad
 
 ```{python}
 # Vemos cuanto gente menor de edad hay
@@ -143,7 +147,7 @@ print(f'El total de menores de edad son {menores.sum()}')
 sns.boxplot(y=df['age'])
 ```
 
-Como se puede observar en total hay 2  menores a 13 anos de edad, prodederemos a eliminar estas filas, esto no afectara estadisticamente nuestros datos ya que son solo 2 filas de 600 las que eliminaremos
+Como se puede observar en total hay 2  menores a 13 años de edad, prodederemos a eliminar estas filas, esto no afectara estadisticamente nuestros datos ya que son solo 2 filas de 600 las que eliminaremos
 
 ```{python}
 df = df[df['age'] >= 13]
@@ -155,17 +159,17 @@ df.describe()
 sns.boxplot(y=df['age'])
 ```
 
-Como podemos ver, al eliminar a los menores a 13 de edad, ya no hay valores atípicos por debajo del primer cuartil en nuestro boxplot. Incluso si comparamos la media y la desviación estándar después de eliminar a los menores de edad con los valores originales, prácticamente se mantienen iguales: la media pasa de 30.79 a 30.868, y la desviación estándar de 10.19 a 10.117556, respectivamente.
+Como podemos ver, al eliminar a los menores de 13 años, ya no hay valores atípicos por debajo del primer cuartil en nuestro boxplot. Incluso si comparamos la media y la desviación estándar después de eliminar a los menores de edad con los valores originales, prácticamente se mantienen iguales: la media pasa de 30.79 a 30.868, y la desviación estándar de 10.19 a 10.117556, respectivamente.
 
 ```{python}
 df.head()
 ```
 
-# Analisis de datos
+# Análisis de datos
 
-## Analisis variables categoricas
+## Análisis variables categóricas
 
-En esta secciion analizaremos los datos de las variables categoricas para tener una estadistica general lo que se recolectó
+En esta sección analizaremos los datos de las variables categóricas para tener una estadística general lo que se recolectó
 
 ```{python}
 # Obtenemos las fechas del analisis de comportamiento
@@ -184,10 +188,10 @@ print(f'Rango de fechas: {fecha_maxima - fecha_minima}')
 df['Timestamp'].hist(bins=12, figsize=(10,5))
 ```
 
-La recolección de datos fue hecha aproximadamente en un rango de 11 dias
+La recolección de datos fue hecha aproximadamente en un rango de 11 días
 
 ```{python}
-# Dastribucion de datos por genero
+# Distribucion de datos por genero
 
 
 value_counts = df['Gender'].value_counts(normalize=True) * 100
@@ -208,7 +212,7 @@ for i, v in enumerate(value_counts.values):
 plt.show()
 ```
 
-La mayoria de los datos recolectados de la poblacion fueron mujeres con un 58%
+La mayoria de los datos recolectados de la población fueron mujeres con un 58%
 
 ```{python}
 # Frecuencia de compra
@@ -232,11 +236,11 @@ for i, v in enumerate(value_counts.values):
 plt.show()
 ```
 
--La mayoria de los usuarios dice que compra algunas veces al mes siendo un 33.7%, 
--20.6% menos de una vez al mes
--18.6% Una vez a la semana
--17.8% una vez al mes
--9.3% multiples veces al la semana
+- La mayoria de los usuarios dice que compra algunas veces al mes siendo un 33.7%
+- 20.6% menos de una vez al mes
+- 18.6% Una vez a la semana
+- 17.8% una vez al mes
+- 9.3% multiples veces al la semana
 
 ```{python}
 # Obtenemos las categorias mas populares
@@ -256,7 +260,7 @@ purchases_by_category.plot(title='Categorias', kind='barh', xlabel='Categorias',
 plt.show()
 ```
 
-Como podemos ver tenemos alrededor de 29 categorias, las cuales reduciremos a las categorias unicas en el siguiente codigo
+Como podemos ver tenemos alrededor de 29 categorías, las cuales reduciremos a las categorías únicas en el siguiente código
 
 ```{python}
 total_registros = len(df)
@@ -351,13 +355,8 @@ plt.show()
 Se puede apreciar que al final solo hay cinco categorias unicas, siendo que el 57% de los usarios prefieren ropa y moda, 53% belleza y cuidado personal, 36% hogar y cocina, 28% otros y comida el 18%
 
 ```{python}
-# df['Purchase_Categories'] = df['Purchase_Categories'].str.split(';')
-# df = df.explode('Purchase_Categories').reset_index(drop=True)
-
 df_dummies = pd.get_dummies(df_copy['Purchase_Categories'])
-#df_combined = df.join(df_dummies).groupby('Timestamp').max().reset_index()
 df_combined = df_copy.join(df_dummies).groupby('id').max().reset_index()
-#df_combined = df.join(df_dummies).groupby('Timestamp').max().reset_index()
 
 df_combined.sample(10)
 ```
@@ -375,9 +374,8 @@ def comunidad(server: str, df: pd.DataFrame=df_filtered):
         Para filtrar sus usuarios únicos de cada comunidad
     '''
     return df.query(f'`{server}` == True')['id'].drop_duplicates()
-```
 
-```{python}
+
 comunidad_list_top_three = category_counts.index[:3].tolist()
 
 
@@ -443,7 +441,7 @@ ax.set_title(
 plt.show()
 ```
 
-Adjuntar comentario - Lucel
+Entre las categorías `Clothing and Fashion`, `Beauty and Personal Care`, `Home and Kitchen` hay una gran preferencia por los encuestados, prácticamente un 90% de ellos
 
 ```{python}
 fig, ax = plt.subplots(figsize=(10, 8))
@@ -494,7 +492,7 @@ ax.set_title(
 plt.show()
 ```
 
-Adjuntar comentario - Lucel
+A partir del mismo, podemos ver que el 16% de los encuestados son los que eligen las 3 categorías en concreto, solo detrás de los que eligen solo `Clothing and Fashion` o `Beauty and Personal Care`
 
 ```{python}
 fig, ax = plt.subplots(figsize=(10, 8))
@@ -531,7 +529,7 @@ ax.set_title(
 plt.show()
 ```
 
-Adjuntar comentario - Lucel
+Comparando solo las categorías más solicitadas vemos que 293 encuestados son los que eligen solamente uno de las tres.
 
 ```{python}
 # Dsitribucions de frecuencia si los usarios han hecho alguna compra basado en los recomendaciones de amazon
@@ -578,7 +576,7 @@ for i, v in enumerate(value_counts.values):
 plt.show()
 ```
 
-La mayoria de lo usarios dice que navega algunas veces por semana siendo un 41.4%, 33.1% dice que navega agunas veces por mes, y 12.8% dice que multiples veces en el dia y yambien 12.8% dice que raramente
+La mayoría de los usuarios dice que navega algunas veces por semana, siendo un 41.4%, el 33.1% dice que navega algunas veces por mes, el 12.8% dice que navega múltiples veces en el día, y también el 12.8% dice que raramente.
 
 ```{python}
 # Como buscas los productos?
@@ -601,7 +599,7 @@ for i, v in enumerate(value_counts.values):
 plt.show()
 ```
 
-37.2% de los usuarios dijo  que su metodo de busqueda era por categorias, 35.7% dijo que era por palabras clave, 21.2% dijo que eran por filtro y 6% otros
+El 37.2% de los usuarios dijo que su método de búsqueda era por categorías, el 35.7% dijo que era por palabras clave, el 21.2% dijo que era por filtros, y el 6% dijo otros.
 
 ```{python}
 #Busqueda en primera pagina o multiples paginas
@@ -625,7 +623,7 @@ for i, v in enumerate(value_counts.values):
 plt.show()
 ```
 
-73.4% de los usarios ddijo que tiende a navegar en multiples paginas, mientrads que el 26.6% dijo que se enfoca en la primera pagina
+73.4% de los usuarios dijo que tiende a navegar en múltiples páginas, mientras que el 26.6% dijo que se enfoca en la primera página
 
 ```{python}
 # Agregas al carrito mientras naveghas
@@ -648,7 +646,7 @@ for i, v in enumerate(value_counts.values):
 plt.show()
 ```
 
-41.2% de usuarios dijo que tal vez agregaba al carrito mientras navegaba,  35.9% dijo que si y 22.9% dijo que no
+41.2% de usuarios dijo que tal vez agregaba al carrito mientras navegaba,  35.9% dijo que sí y 22.9% dijo que no
 
 ```{python}
 # Que tan seguido se completa la compra despeus de agregar ala carrito
@@ -846,7 +844,7 @@ for i, v in enumerate(value_counts.values):
 plt.show()
 ```
 
-### Analisis prueba chi cuadrada para independencia variables vs factores de abandono de carrito
+### Análisis prueba chi cuadrada para independencia variables vs factores de abandono de carrito
 
 ```{python}
 from scipy.stats import chi2_contingency
@@ -915,77 +913,77 @@ analyze_cart_abandonment(df, 'Cart_Abandonment_Factors', exclude_col='Purchase_C
 
 ```{python}
 
-        
-        # Creacion de tabla de contingenca
-        cross_tab = pd.crosstab(df_copy['Purchase_Categories'], df_copy['Cart_Abandonment_Factors'])
-        print("Cross-Tabulation Table:")
-        print(cross_tab)
-        
-        # Visualize de tabla de contingencia
-        plt.figure(figsize=(10, 4))
-        sns.heatmap(cross_tab, annot=True, fmt='d', cmap='coolwarm')
-        plt.title(f'Cart Abandonment Factors por {col}')
-        plt.show()
-        
-        #  Chi-Square test
-        chi2, p, dof, expected = chi2_contingency(cross_tab)
-        print(f"Chi-Square Statistic: {chi2}")
-        print(f"p-value: {p}")
-        print(f"Degrees of Freedom: {dof}")
-        print("Expected Frequencies Table:")
-        print(expected)
-        print()
 
-        alpha = .05
-        if p < alpha:
-            print(f'Conclusion: Como p_value ({p:.4f}) es menor a alpha de {alpha}, rechazamos la H0(hipotesis nula)')
-            print()
+# Creacion de tabla de contingenca
+cross_tab = pd.crosstab(df_copy['Purchase_Categories'], df_copy['Cart_Abandonment_Factors'])
+print("Cross-Tabulation Table:")
+print(cross_tab)
 
-            print(f'Por lo tanto hay diferencias significativas entre los grupos, es decir que hay evidencia estadistica para decir que existe una asociacion entre Purchase categories y  Cart_Abandonment_Factors')
-            rejected_columns.append(col)
-        else:
-            print(f'Conclusion: Como p_value  ({p:.4f}) es mayor a alpha de {alpha}, no hay suficiente evidencia para rechazar  H0(hipotesis nula)')
-            print()
+# Visualize de tabla de contingencia
+plt.figure(figsize=(10, 4))
+sns.heatmap(cross_tab, annot=True, fmt='d', cmap='coolwarm')
+plt.title(f'Cart Abandonment Factors por {col}')
+plt.show()
 
-            print(f'Por lo tanto no hay diferencias significativas entre los grupos, es decir que NO hay evidencia estadistica para decir que existe una asociacion entre Purchase categories y  Cart_Abandonment_Factors')
+#  Chi-Square test
+chi2, p, dof, expected = chi2_contingency(cross_tab)
+print(f"Chi-Square Statistic: {chi2}")
+print(f"p-value: {p}")
+print(f"Degrees of Freedom: {dof}")
+print("Expected Frequencies Table:")
+print(expected)
+print()
+
+alpha = .05
+if p < alpha:
+    print(f'Conclusion: Como p_value ({p:.4f}) es menor a alpha de {alpha}, rechazamos la H0(hipotesis nula)')
+    print()
+
+    print(f'Por lo tanto hay diferencias significativas entre los grupos, es decir que hay evidencia estadistica para decir que existe una asociacion entre Purchase categories y  Cart_Abandonment_Factors')
+    rejected_columns.append(col)
+else:
+    print(f'Conclusion: Como p_value  ({p:.4f}) es mayor a alpha de {alpha}, no hay suficiente evidencia para rechazar  H0(hipotesis nula)')
+    print()
+
+    print(f'Por lo tanto no hay diferencias significativas entre los grupos, es decir que NO hay evidencia estadistica para decir que existe una asociacion entre Purchase categories y  Cart_Abandonment_Factors')
 
 
-        print("-" * 50)
+print("-" * 50)
 ```
 
-Conclusiones por categoria
+### Conclusiones por categoria
 
-Browsing_Frequency
+`Browsing_Frequency`
 
 - Se puede concluir que existe una relación entre la frecuencia de navegación y los factores de abandono de carrito, ya que los usuarios que se conectan algunas veces a la semana y encuentran mejores precios en otros sitios son quienes abandonan más el carrito.
 
 
-Product_Search_Method
+`Product_Search_Method`
 - Se puede concluir que existe una relación entre el método de búsqueda de producto y los factores de abandono de carrito, ya que los usuarios que buscan por categoría y cambian de opinión o ya no necesitan el artículo son quienes más abandonan el carrito.  Dime cuantas veces por se repite que la conclusion es una de estas cuatro , cambio de opinion y/o ya no necesia el articulo, encontrpo mejor precio en otro lugar, altos costos de envio, otros 
 
 
-Search_Result_Exploration
+`Search_Result_Exploration`
 Se puede concluir que existe una relación entre la exploración de resultados de búsqueda y los factores de abandono de carrito, ya que los usuarios que navegaron en múltiples páginas y encontraron un mejor precio en otro lugar son quienes más abandonan el carrito.
 
-Cart_Completion_Frequency
+`Cart_Completion_Frequency`
 - Se puede concluir que existe una relación entre la frecuencia con la que se completa el carrito y los factores de abandono de carrito, ya que los usuarios que seguido completan el carrito y que encuentran un precio en un mejor lugar son los que más abandonan.
 
-Saveforlater_Frequency
+`Saveforlater_Frequency`
 - Se puede concluir que existe una relación entre el uso de la función "guardar para más tarde" y los factores de abandono de carrito, ya que los usuarios que a veces usan la función "guardar para más tarde" y que encuentran un precio en un mejor lugar son los que más abandonan.
 
-Review_Reliability
+`Review_Reliability`
 - Se puede concluir que existe una relación entre la confianza en las reseñas de producto y los factores de abandono de carrito, ya que los usuarios que ocasionalmente confían en la reseña de producto y encuentran un precio en otro lugar son los que más abandonan.
 
-Review_Helpfulness
+`Review_Helpfulness`
 - Se puede concluir que existe una relación entre la utilidad de la información de las reseñas de producto y los factores de abandono de carrito, ya que los usuarios que a veces encontraban utilidad en la información de las reseñas y cambiaban de opinión o ya no necesitaban el artículo son los que más abandonan.
 
-Recommendation_Helpfulness
+`Recommendation_Helpfulness`
 - Se puede concluir que existe una relación entre la utilidad de las recomendaciones y los factores de abandono de carrito, ya que los usuarios que hallaban las recomendaciones útiles y abandonaban por altos costos de envío son los que más abandonaban. Después de ahí, los que más abandonan son los que no habían encontrado las recomendaciones útiles y cambiaban de opinión o ya no necesitaban el artículo.
 
-Service_Appreciation
+`Service_Appreciation`
 - Se puede concluir que existe una relación entre el aspecto del servicio de Amazon que más apreciaban y los factores de abandono de carrito, ya que los usuarios que apreciaban el precio competitivo y encontraban un mejor precio en otro lugar son los que más abandonaban. Los segundos que más abandonan son los que apreciaban las recomendaciones de productos y abandonaban ya sea porque cambiaban de opinión y ya no necesitaban el artículo o porque encontraron un mejor precio en otro lugar.
 
-Improvement_Areas
+`Improvement_Areas`
 - Se puede concluir que existe una relación entre las áreas que se creen que deben mejorar y los factores de abandono de carrito, ya que los usuarios que creían que Amazon tenía que mejorar su servicio en respuesta de servicio al cliente abandonaban ya sea porque cambiaban de opinión y ya no necesitaban el artículo o porque encontraron un mejor precio en otro lugar.
 
 ### Conclusion general variables categoricas
@@ -1015,11 +1013,11 @@ Otros → 0 veces
 
 
 
-En conclusion podemos decir que lo que mas impacta para el abandono del carrito es que los usarios encuentran mejor precio en otro lugar, seguido de que cambiaron de opinion o ya no necesitan el articulo
+En conclusión podemos decir que lo que más impacta para el abandono del carrito es que los usarios encuentran mejor precio en otro lugar, seguido de que cambiaron de opinion o ya no necesitan el articulo
 
 ## Analisis variables numericas
 
-En esta sección analizaremos las variables numericas que se tienen en el data set para tener una estadistica descriptiva de la recolección de datos
+En esta sección analizaremos las variables numéricas que se tienen en el dataset para tener una destadística descriptiva de la recolección de datos
 
 ```{python}
 # Obtenemos histogramas de las estadisticas numericas generales
@@ -1099,9 +1097,9 @@ plt.title('Pareto Chart of Cart Abandonment Factors')
 plt.show()
 ```
 
-En el primer grafico de barras los factores de abandono de carrito podemos ver que los que mas sobresalen son que se encontro un mejor precio con un 42% y que mejor se cambia de opinion o ya no necesita mas el articulo con un 40% mientras que los otras dos categorias como la de alto costo de envio y otros representan el 11% y 5% respectivamente.
+En el primer gráfico de barras los factores de abandono de carrito podemos ver que los que mas sobresalen son que se encontró un mejor precio con un 42% y que mejor se cambia de opinión o ya no necesita mas el articulo con un 40% mientras que los otras dos categorías como la de alto costo de envío y otros representan el 11% y 5% respectivamente.
 
-Despues de eso se hace un pareto para saber cules son los principales factores que se tendrian que analizar, que en este caso serian 'Se encontro un mejor precio en otro lugar y 'Se cambio de opinion o no necesita mas el articulo' pues son las que mas efectos tienen al abandono
+Después de eso se hace un pareto para saber cuales son los principales factores que se tendrían que analizar, que en este caso serian `Se encontró un mejor precio en otro lugar` y `Se cambió de opinión o no necesita más el artículo` pues son las que más efectos tienen al abandono
 
 ```{python}
 # Hacemo un box plot de los factores de abandono vs edad
@@ -1127,11 +1125,6 @@ filtered_df = df[df['Cart_Abandonment_Factors'].isin(categoria_abandono)]
 plt.figure(figsize=(10,8))
 sns.boxplot(x = 'Cart_Abandonment_Factors', y = 'age', data=filtered_df)
 ```
-
-Eliminar valores atipicos(gente menor de edad)
-
--Su hijo le comopro
--Posible typo
 
 ```{python}
 #Factores de abandono vs importancia de resenas de cliente

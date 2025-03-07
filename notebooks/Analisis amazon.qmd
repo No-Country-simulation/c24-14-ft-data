@@ -1,7 +1,7 @@
 ---
-title: "Comportamiento de usuarios de Amazon"
+title: Comportamiento de usuarios de Amazon
 jupyter: python3
-lang: "es"
+lang: es
 execute:
   echo: false
   output: false
@@ -33,11 +33,13 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 from matplotlib import pyplot as plt
+from scipy import stats as st
+from scipy.stats import levene
 
 # Importacion de dataset
 
 
-#df = pd.read_csv("C:/Users/janto/OneDrive/Documentos/No country/Amazon Customer Behavior Survey.csv")
+
 from typing import Final
 import os
 import kagglehub
@@ -106,6 +108,8 @@ df.isna().sum()
 print(df['Product_Search_Method'].unique())
 ```
 
+Se tienen dos datos nulos en la columna product_search_methos, sin embargo los dejaremos en nan
+
 ```{python}
 # Checamos si hay duplicados
 
@@ -125,10 +129,10 @@ print(df.nunique())
 df.describe()
 ```
 
-Vemos que dentro de nustros datos hay personas menores de edad, habiendo edades de hasta 3 años,para tener una cuenta en amazon se debe de tener por lo menos 13 años, es asi que procederemos a ver cuenta gente hay de esta edad
+Vemos que dentro de nuestros datos hay personas menores de edad, habiendo edades de hasta 3 años,para tener una cuenta en amazon se debe de tener por lo menos 13 años, es asi que procederemos a ver cuenta gente hay de esta edad
 
 ```{python}
-# Vemos cuanto gente menor de edad hay
+# Vemos cuanto gente menor a 13 de edad hay
 
 
 edades = df['age'].value_counts().sort_index()
@@ -142,12 +146,11 @@ print(menores)
 print(f'El total de menores de edad son {menores.sum()}')
 ```
 
-
 ```{python}
 sns.boxplot(y=df['age'])
 ```
 
-Como se puede observar en total hay 2  menores a 13 años de edad, prodederemos a eliminar estas filas, esto no afectara estadisticamente nuestros datos ya que son solo 2 filas de 600 las que eliminaremos
+Como se puede observar en total hay 2  menores a 13 años de edad, procederemos a eliminar estas filas, esto no afectara estadisticamente nuestros datos ya que son solo 2 filas de 600 las que eliminaremos
 
 ```{python}
 df = df[df['age'] >= 13]
@@ -263,6 +266,8 @@ plt.show()
 Como podemos ver tenemos alrededor de 29 categorías, las cuales reduciremos a las categorías únicas en el siguiente código
 
 ```{python}
+
+#Categorias unicas
 total_registros = len(df)
 df_copy = df.copy()
 df_copy['Purchase_Categories'] = df_copy['Purchase_Categories'].str.split(';')
@@ -355,6 +360,8 @@ plt.show()
 Se puede apreciar que al final solo hay cinco categorias unicas, siendo que el 57% de los usarios prefieren ropa y moda, 53% belleza y cuidado personal, 36% hogar y cocina, 28% otros y comida el 18%
 
 ```{python}
+#Combinaciones de categorias unicas por usuario
+
 df_dummies = pd.get_dummies(df_copy['Purchase_Categories'])
 df_combined = df_copy.join(df_dummies).groupby('id').max().reset_index()
 
@@ -362,6 +369,8 @@ df_combined.sample(10)
 ```
 
 ```{python}
+# Adjuntar comentario Lucel
+
 from matplotlib.ticker import FuncFormatter
 from matplotlib.font_manager import fontManager, FontProperties
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
@@ -444,6 +453,8 @@ plt.show()
 Entre las categorías `Clothing and Fashion`, `Beauty and Personal Care`, `Home and Kitchen` hay una gran preferencia por los encuestados, prácticamente un 90% de ellos
 
 ```{python}
+# Adjuntar comentario Lucel
+
 fig, ax = plt.subplots(figsize=(10, 8))
 
 venn = venn3(
@@ -495,6 +506,8 @@ plt.show()
 A partir del mismo, podemos ver que el 16% de los encuestados son los que eligen las 3 categorías en concreto, solo detrás de los que eligen solo `Clothing and Fashion` o `Beauty and Personal Care`
 
 ```{python}
+# Adjuntar comentarios Lucel
+
 fig, ax = plt.subplots(figsize=(10, 8))
 
 
@@ -649,7 +662,7 @@ plt.show()
 41.2% de usuarios dijo que tal vez agregaba al carrito mientras navegaba,  35.9% dijo que sí y 22.9% dijo que no
 
 ```{python}
-# Que tan seguido se completa la compra despeus de agregar ala carrito
+# Que tan seguido se completa la compra despues de agregar ala carrito
 
 
 value_counts = df['Cart_Completion_Frequency'].value_counts(normalize=True) * 100
@@ -670,8 +683,14 @@ for i, v in enumerate(value_counts.values):
 plt.show()
 ```
 
+- 50.3% de los usarios dijeron que aq veces completaban el carrito
+- 26.3 que siempre lo completaban
+- 12% rara vez completaban el carrito
+- 7.8% siempre completaban el carrito
+- 3.5% nunca completaban el carrito
+
 ```{python}
-# Example: Frequency distribution of Cart_Abandonment_Factors
+# Frecuencia de distribucion categorias abandono de carrito
 value_counts = df['Cart_Abandonment_Factors'].value_counts(normalize=True) * 100
 value_counts = value_counts.sort_values(ascending=True)  
         
@@ -689,6 +708,8 @@ for i, v in enumerate(value_counts.values):
 
 plt.show()
 ```
+
+Prácticamente aquí podemos ver que los factores de abandono de carrito que más sobresalen son 'Se encontró un mejor precio en otro lugar' con un 42.2%, 'Se cambió de opinión o ya no se necesita el producto' con un 40.2%, y después con 11.7% y 6.0% están 'Altos costos de envío' y 'otros', respectivamente
 
 ```{python}
 # Frecuencia del uso de funcion save for later
@@ -711,6 +732,14 @@ for i, v in enumerate(value_counts.values):
 plt.show()
 ```
 
+Respecto al uso de la funcion 'Guardar para mas tarde'
+
+- 41.8% de los usuarios dijo que a veces la utilizaba
+- 25.8% dijp que la utilizaba seguido
+- 13.7% de los usuarios dijo que raramente la utilizaba
+- 9.8% de los usuarios dijo que nunca la utilizaba
+- 8..8% de los usuarios dijo que siempre la utilizaba
+
 ```{python}
 # Resena hecha
 
@@ -731,6 +760,8 @@ for i, v in enumerate(value_counts.values):
 
 plt.show()
 ```
+
+Practicamente mitad y mitad dejan o no resena siendo un 48.7% que no y 51.3% que si
 
 ```{python}
 # Confianza en las resenas al hacer compra
@@ -755,8 +786,20 @@ for i, v in enumerate(value_counts.values):
 plt.show()
 ```
 
+Aquí se le preguntó al usuario qué tanto confía en las reseñas de los productos, para lo cual:
+
+- 33% dijo que confía moderadamente.
+
+- 31.5% dijo que ocasionalmente confía en las reseñas.
+
+- 24.8% dijo que confía fuertemente.
+
+- 6.8% raramente confiaba en las reseñas.
+
+- 3.8% nunca confiaba en las reseñas.
+
 ```{python}
-# Las resenas de otors clientes son utiles?
+# Las resenas de otros clientes son utiles?
 
 
 value_counts = df['Review_Helpfulness'].value_counts(normalize=True) * 100
@@ -776,6 +819,8 @@ for i, v in enumerate(value_counts.values):
 
 plt.show()
 ```
+
+En esta grafica se ve que el 39.3% de los clientes considera util las resenas, 37.7% dijo que a veces las considera utiles y el 23% dijo que no las considera utiles
 
 ```{python}
 # Recomendaciones utiles
@@ -800,6 +845,8 @@ for i, v in enumerate(value_counts.values):
 plt.show()
 ```
 
+Los usarios que consideraron que las rcomendaciones a veces eran utiles fue de un 45.2%, los que dijeron que no eran utiles fue de un 28.7% y los que dijeron que si eran utiles fue de un 26.2%
+
 ```{python}
 # Aspectos de servicio que mas se valoran
 
@@ -821,6 +868,16 @@ for i, v in enumerate(value_counts.values):
 
 plt.show()
 ```
+
+Dentro de los aspectos de servicio que más destacaban los usuarios fueron:
+
+- Recomendaciones de productos con un 30.8%.
+
+- Precios competitivos con un 30.2%.
+
+- Variedad de productos con un 24.8%.
+
+- Interfaz amigable de la aplicación con un 13.3%.
 
 ```{python}
 # Areas a mejorar
@@ -844,7 +901,19 @@ for i, v in enumerate(value_counts.values):
 plt.show()
 ```
 
+Dentro de las principales áreas a mejorar según los usuarios fueron:
+
+- 35.8% dijo que la respuesta de servicio al cliente.
+
+- 26.5% la calidad del producto.
+
+- 22.2% reducción de los residuos de empaque.
+
+- 13.2% rapidez y confianza de envío.
+
 ### Análisis prueba chi cuadrada para independencia variables vs factores de abandono de carrito
+
+Para el analisis de las variables categoricas y su relacion con los factores de abandono de carrito se realizara una prueba chi cuadrada para independencia para ver si hay algun tipo de relacion
 
 ```{python}
 from scipy.stats import chi2_contingency
@@ -912,9 +981,7 @@ analyze_cart_abandonment(df, 'Cart_Abandonment_Factors', exclude_col='Purchase_C
 ```
 
 ```{python}
-
-
-# Creacion de tabla de contingenca
+# Creacion de tabla de contingenca para test de categorias de compra unicas y factores de abandono de carrito
 cross_tab = pd.crosstab(df_copy['Purchase_Categories'], df_copy['Cart_Abandonment_Factors'])
 print("Cross-Tabulation Table:")
 print(cross_tab)
@@ -922,7 +989,7 @@ print(cross_tab)
 # Visualize de tabla de contingencia
 plt.figure(figsize=(10, 4))
 sns.heatmap(cross_tab, annot=True, fmt='d', cmap='coolwarm')
-plt.title(f'Cart Abandonment Factors por {col}')
+plt.title(f'Cart Abandonment Factors por categorias de compra unicas')
 plt.show()
 
 #  Chi-Square test
@@ -1008,8 +1075,8 @@ Encontró mejor precio en otro lugar → 6 veces
 
 Altos costos de envío → 1 vez
 
-Recommendation_Helpfulness
-Otros → 0 veces
+- Recommendation_Helpfulness
+
 
 
 
@@ -1021,31 +1088,67 @@ En esta sección analizaremos las variables numéricas que se tienen en el datas
 
 ```{python}
 # Obtenemos histogramas de las estadisticas numericas generales
-coulumas_numericas =  df.columns.drop('id')
+columnas_numericas =  df.columns.drop(['Timestamp','id'])
 
-df[coulumas_numericas].hist(figsize=(15, 10))
+df[columnas_numericas].hist(figsize=(15, 10))
+```
+
+Se obtiene los histogramas de las variables numericas en donde se puede ver que salen practicament de esta forma porque en la preguntas las opciones van del 1 al 5(a excepcion de edad) por ende los histogramas no obtienen una distribucion normal del todo o algun tipo de trend
+
+```{python}
+columnas_numericas =  df.drop(columns=['Timestamp','id'])
+
+columnas_numericas = columnas_numericas.select_dtypes(include=['float64', 'int64'])
+
+print(columnas_numericas.columns)
 ```
 
 ```{python}
-correlation = df_numerical_values.corr()
+
+
+
+correlation = columnas_numericas.corr()
 plt.figure(figsize=(10,10))
 sns.heatmap(correlation,annot=True, cmap='coolwarm', linewidths=0.5)
 plt.title('Correlation matrix')
 plt.show()
 ```
 
-# Analisis objetivo: Factores abandono de carrito
+```{python}
+correlation_shopping_rating = df['Shopping_Satisfaction'].corr(df['Rating_Accuracy'])
+
+print(correlation_shopping_rating)
+```
 
 ```{python}
-# Impreimimos los factores unicos de abandono 
+
+
+sns.regplot(x='Shopping_Satisfaction', y='Rating_Accuracy', data=df, scatter_kws = {'color':'blue'}, line_kws={'color' : 'red'})
+
+plt.title('Correlacion satisfaction de compra  y relevancia de las recomendaciones')
+plt.show()
+
+group = df.groupby(['Shopping_Satisfaction', 'Rating_Accuracy']).size().reset_index(name='count')
+print(group)
+```
+
+A pesar de que hay una correlacion de ..51 entre la satisfaccion de compra y la precision de las recomendaciones dadas se puede ver que esta correlacion al graficarrla no hay un patron muy claro pues recoredemos que al ser las opciones del 1-5 en cada categoria hace que se vea asi
+
+# Analisis objetivo: Factores abandono de carrito
+
+En esta sección, analizaremos la categoría o columna objetivo de los factores de abandono de carrito frente a los valores numéricos, con el fin de determinar si existe alguna diferencia entre un factor de abandono y ciertas categorías numéricas.
+
+```{python}
+# Imprimimos los factores unicos de abandono 
 
 print(df['Cart_Abandonment_Factors'].unique())
 ```
 
 ```{python}
+# Grafica de distribucion de factores de abandono
 factor_counts = df['Cart_Abandonment_Factors'].value_counts()
 
-# Step 2: Sort the factors in descending order
+# Factores de abandono 
 factor_counts = factor_counts.sort_values(ascending=False)
 
 percentage_per_value = df['Cart_Abandonment_Factors'].value_counts(normalize=True) * 100
@@ -1063,36 +1166,36 @@ plt.title(f'Cart_Abandonment_Factors')
 plt.xlabel('Percentage (%)')
 plt.ylabel(None)
       
-        
+
+# Pareto chart para ver cuales son los factores de abandono que mas contribuyen 
+      
 for i, v in enumerate(value_counts.values):
     plt.text(v + 0.5, i, f"{v:.1f}%", color='black', va='center')
         
 
 plt.show()
 
-# Step 3: Calculate the cumulative percentage
+# Valores acumulados
 cumulative_percentage = np.cumsum(factor_counts) / np.sum(factor_counts) * 100
 
 
-# Step 4: Plot the Pareto chart
+#  Pareto chart
 fig, ax1 = plt.subplots(figsize=(15,6))
 
-# Bar plot for the frequencies
+# Barra frecuencias
 ax1.bar(factor_counts.index, factor_counts, color='b')
 ax1.set_xlabel(None)
 ax1.set_ylabel('Frequency', color='b')
 ax1.tick_params(axis='y', labelcolor='b')
 
-# Line plot for the cumulative percentage
+# Line para el acumulado
 ax2 = ax1.twinx()
 ax2.plot(factor_counts.index, cumulative_percentage, color='r', marker='o')
 ax2.set_ylabel('Cumulative Percentage', color='r')
 ax2.tick_params(axis='y', labelcolor='r')
 
-# Rotate x-axis labels for better readability
 plt.xticks(rotation=45, ha='right')
 
-# Display the chart
 plt.title('Pareto Chart of Cart Abandonment Factors')
 plt.show()
 ```
@@ -1100,6 +1203,10 @@ plt.show()
 En el primer gráfico de barras los factores de abandono de carrito podemos ver que los que mas sobresalen son que se encontró un mejor precio con un 42% y que mejor se cambia de opinión o ya no necesita mas el articulo con un 40% mientras que los otras dos categorías como la de alto costo de envío y otros representan el 11% y 5% respectivamente.
 
 Después de eso se hace un pareto para saber cuales son los principales factores que se tendrían que analizar, que en este caso serian `Se encontró un mejor precio en otro lugar` y `Se cambió de opinión o no necesita más el artículo` pues son las que más efectos tienen al abandono
+
+### T-test para las medias factores principales de abandono('Se encontro un mejor precio en otro lugar vs se cambio de opinion o ya no necesita el articulo') y variables numericas
+
+Se hace un boxplot junto con un t-test de las medias de esas dos categorias de la variable factores de abandono de carrito vs las variables numericas para ver si hay diferencias siginificativas entre 'Se encuentra precio en un mejor lugar' y 'Cambio de opinion o ya no necesita el articulo'
 
 ```{python}
 # Hacemo un box plot de los factores de abandono vs edad
@@ -1124,7 +1231,42 @@ filtered_df = df[df['Cart_Abandonment_Factors'].isin(categoria_abandono)]
 
 plt.figure(figsize=(10,8))
 sns.boxplot(x = 'Cart_Abandonment_Factors', y = 'age', data=filtered_df)
+plt.show()
+print()
+# Realizamos el levene test para confrimar que nestras varianzas sean iguales antes de hacer el ttest de medias
+
+group1 =  df[df['Cart_Abandonment_Factors'] == categoria_abandono[0]]['age']
+group2 =  df[df['Cart_Abandonment_Factors'] == categoria_abandono[1]]['age']
+
+statistic, p_value = levene(group1, group2)
+print("Levene's test statistic:", statistic)
+print('p-value', p_value)
+
+
+alpha = 0.05
+
+if p_value < alpha:
+    print('Se rechaza la hipotesis nula, varianzas son significativamente diferentes')
+else:
+    print('No se puede rechazar la hipotesis nula, varianzas no son significativamente diferenrtes')
+
+print()
+
+
+alpha = 0.05
+
+results = st.ttest_ind(group1, group2, equal_var=(p_value>=alpha))
+
+print('Valor p:', results.pvalue)
+
+if results.pvalue < alpha:
+    print('Rechazamos la hipotesis nula, es decir que hay diferencias significativas entre los dos grupos')
+else:
+    print('NO hay suficiente evidencia para rechazar la hipotesis nula, es decir que NO hay diferencias significativas entre los dos grupos')
+
 ```
+
+Para la variable edad, no existe una diferencia significativa entre los grupos "Se encontró un mejor precio en otro lugar" y "Se cambió de opinión o ya no se necesita el producto", pues no hay evidencia estadística de que la edad sea un factor para abandonar el carrito por alguna de estas dos categorías.
 
 ```{python}
 #Factores de abandono vs importancia de resenas de cliente
@@ -1150,10 +1292,46 @@ filtered_df = df[df['Cart_Abandonment_Factors'].isin(categoria_abandono)]
 
 plt.figure(figsize=(10,8))
 sns.boxplot(x = 'Cart_Abandonment_Factors', y = 'Customer_Reviews_Importance', data=filtered_df)
+plt.show()
+print()
+# Realizamos el levene test para confrimar que nestras varianzas sean iguales antes de hacer el ttest de medias
+
+group1 =  df[df['Cart_Abandonment_Factors'] == categoria_abandono[0]]['Customer_Reviews_Importance']
+group2 =  df[df['Cart_Abandonment_Factors'] == categoria_abandono[1]]['Customer_Reviews_Importance']
+
+statistic, p_value = levene(group1, group2)
+print("Levene's test statistic:", statistic)
+print('p-value', p_value)
 
 
-# algo 
+alpha = 0.05
+
+if p_value < alpha:
+    print('Se rechaza la hipotesis nula, varianzas son significativamente diferentes')
+    equal_var = False
+else:
+    print('No se puede rechazar la hipotesis nula, varianzas no son significativamente diferenrtes')
+    equal_var = True
+
+print()
+
+
+alpha = 0.05
+
+results = st.ttest_ind(group1, group2, equal_var=equal_var)
+
+print('Valor p:', results.pvalue)
+
+if results.pvalue < alpha:
+    print('Rechazamos la hipotesis nula, es decir que hay diferencias significativas entre los dos grupos')
+else:
+    print('NO hay suficiente evidencia para rechazar la hipotesis nula, es decir que NO hay diferencias significativas entre los dos grupos')
+
+
+
 ```
+
+Para la variable importancia de las resenas del cliente, no existe una diferencia significativa entre los grupos "Se encontró un mejor precio en otro lugar" y "Se cambió de opinión o ya no se necesita el producto", pues no hay evidencia estadística de que la importancia de las resenas del cliente sea un factor para abandonar el carrito por alguna de estas dos categorías.
 
 ```{python}
 #Factores de abandono vs Que tan seguido se recibe recomendaciones personalizadas
@@ -1179,6 +1357,39 @@ filtered_df = df[df['Cart_Abandonment_Factors'].isin(categoria_abandono)]
 
 plt.figure(figsize=(10,8))
 sns.boxplot(x = 'Cart_Abandonment_Factors', y = 'Personalized_Recommendation_Frequency_2', data=filtered_df)
+plt.show()
+print()
+# Realizamos el levene test para confrimar que nestras varianzas sean iguales antes de hacer el ttest de medias
+
+group1 =  df[df['Cart_Abandonment_Factors'] == categoria_abandono[0]]['Personalized_Recommendation_Frequency_2']
+group2 =  df[df['Cart_Abandonment_Factors'] == categoria_abandono[1]]['Personalized_Recommendation_Frequency_2']
+
+statistic, p_value = levene(group1, group2)
+print("Levene's test statistic:", statistic)
+print('p-value', p_value)
+
+
+alpha = 0.05
+
+if p_value < alpha:
+    print('Se rechaza la hipotesis nula, varianzas son significativamente diferentes')
+else:
+    print('No se puede rechazar la hipotesis nula, varianzas no son significativamente diferenrtes')
+
+print()
+
+
+alpha = 0.05
+
+results = st.ttest_ind(group1, group2, equal_var=(p_value>=alpha))
+
+print('Valor p:', results.pvalue)
+
+if results.pvalue < alpha:
+    print('Rechazamos la hipotesis nula, es decir que hay diferencias significativas entre los dos grupos')
+else:
+    print('NO hay suficiente evidencia para rechazar la hipotesis nula, es decir que NO hay diferencias significativas entre los dos grupos')
+
 ```
 
 ```{python}
@@ -1205,7 +1416,42 @@ filtered_df = df[df['Cart_Abandonment_Factors'].isin(categoria_abandono)]
 
 plt.figure(figsize=(10,8))
 sns.boxplot(x = 'Cart_Abandonment_Factors', y = 'Rating_Accuracy', data=filtered_df)
+plt.show()
+print()
+# Realizamos el levene test para confrimar que nestras varianzas sean iguales antes de hacer el ttest de medias
+
+group1 =  df[df['Cart_Abandonment_Factors'] == categoria_abandono[0]]['Rating_Accuracy']
+group2 =  df[df['Cart_Abandonment_Factors'] == categoria_abandono[1]]['Rating_Accuracy']
+
+statistic, p_value = levene(group1, group2)
+print("Levene's test statistic:", statistic)
+print('p-value', p_value)
+
+
+alpha = 0.05
+
+if p_value < alpha:
+    print('Se rechaza la hipotesis nula, varianzas son significativamente diferentes')
+else:
+    print('No se puede rechazar la hipotesis nula, varianzas no son significativamente diferenrtes')
+
+print()
+
+
+alpha = 0.05
+
+results = st.ttest_ind(group1, group2, equal_var=(p_value>=alpha))
+
+print('Valor p:', results.pvalue)
+
+if results.pvalue < alpha:
+    print('Rechazamos la hipotesis nula, es decir que hay diferencias significativas entre los dos grupos')
+else:
+    print('NO hay suficiente evidencia para rechazar la hipotesis nula, es decir que NO hay diferencias significativas entre los dos grupos')
+
 ```
+
+Para la variable relevancia y precision de las recomendaciones recibidas, no existe una diferencia significativa entre los grupos "Se encontró un mejor precio en otro lugar" y "Se cambió de opinión o ya no se necesita el producto", pues no hay evidencia estadística de que la relevancia y precision de las recomendaciones recibidas sea un factor para abandonar el carrito por alguna de estas dos categorías.
 
 ```{python}
 #Factores de abandono vs Satisfaction de la compra
@@ -1231,5 +1477,56 @@ filtered_df = df[df['Cart_Abandonment_Factors'].isin(categoria_abandono)]
 
 plt.figure(figsize=(10,8))
 sns.boxplot(x = 'Cart_Abandonment_Factors', y = 'Shopping_Satisfaction', data=filtered_df)
+plt.show()
+print()
+# Realizamos el levene test para confrimar que nestras varianzas sean iguales antes de hacer el ttest de medias
+
+group1 =  df[df['Cart_Abandonment_Factors'] == categoria_abandono[0]]['Shopping_Satisfaction']
+group2 =  df[df['Cart_Abandonment_Factors'] == categoria_abandono[1]]['Shopping_Satisfaction']
+
+statistic, p_value = levene(group1, group2)
+print("Levene's test statistic:", statistic)
+print('p-value', p_value)
+
+
+alpha = 0.05
+
+if p_value < alpha:
+    print('Se rechaza la hipotesis nula, varianzas son significativamente diferentes')
+else:
+    print('No se puede rechazar la hipotesis nula, varianzas no son significativamente diferenrtes')
+
+print()
+
+
+alpha = 0.05
+
+results = st.ttest_ind(group1, group2, equal_var=(p_value>=alpha))
+
+print('Valor p:', results.pvalue)
+
+if results.pvalue < alpha:
+    print('Rechazamos la hipotesis nula, es decir que hay diferencias significativas entre los dos grupos')
+else:
+    print('NO hay suficiente evidencia para rechazar la hipotesis nula, es decir que NO hay diferencias significativas entre los dos grupos')
+
 ```
+
+Para la variable Satisfacion de comptra, no existe una diferencia significativa entre los grupos "Se encontró un mejor precio en otro lugar" y "Se cambió de opinión o ya no se necesita el producto", pues no hay evidencia estadística de que variable Satisfacion de comptra sea un factor para abandonar el carrito por alguna de estas dos categorías.
+
+# Conclusiones
+
+En conclusión, los factores que más destacan son que el cliente encuentra un mejor precio en otro lugar o que ya no necesita el artículo o cambia de opinión. Este abandono es dado primordialmente por las recomendaciones que se le dan al usuario y por la frecuencia de uso de las herramientas relacionadas, como lo son la función "guardar para más tarde", la frecuencia de completado del carrito y la forma de búsqueda (aquí la gente tiende a usar muchas páginas en lugar de una para la busqueda). Es así que las propuestas que se tienen son:
+
+- Mejorar el algoritmo de recomendaciones de acuerdo a las actividades del usuario para que sean más personalizadas.
+
+- Mejorar la interfaz para que sea más amigable en las funciones de completado de carrito, "guardar para más tarde", y agregar recordatorios de lo agregado o de lo abandonado.
+
+- Hacer ofertas entre lo que busque el usuario y las recomendaciones que aparezcan en la página (algún tipo de paquete o combo), como agregar un producto complementario en el carrito.
+
+- Ofrecer descuentos o cupones para usuarios frecuentes.
+
+- Crear un sistema de recompensa por compras recurrentes, como lo puede ser puntos canjeables.
+
+- Herramienta que permita comparar precios de productos similares directamente en Amazon.
 

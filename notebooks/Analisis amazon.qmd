@@ -369,7 +369,10 @@ df_combined.sample(10)
 ```
 
 ```{python}
-# Adjuntar comentario Lucel
+"""
+Armado del dataset para hacer la gráfica de venn
+Calcular cuanto están en común y cuantos solo una categoría
+"""
 
 from matplotlib.ticker import FuncFormatter
 from matplotlib.font_manager import fontManager, FontProperties
@@ -453,7 +456,9 @@ plt.show()
 Entre las categorías `Clothing and Fashion`, `Beauty and Personal Care`, `Home and Kitchen` hay una gran preferencia por los encuestados, prácticamente un 90% de ellos
 
 ```{python}
-# Adjuntar comentario Lucel
+"""
+Gráfico de Venn en sí
+""""
 
 fig, ax = plt.subplots(figsize=(10, 8))
 
@@ -506,7 +511,11 @@ plt.show()
 A partir del mismo, podemos ver que el 16% de los encuestados son los que eligen las 3 categorías en concreto, solo detrás de los que eligen solo `Clothing and Fashion` o `Beauty and Personal Care`
 
 ```{python}
-# Adjuntar comentarios Lucel
+"""
+A partir de las 3 categorías principales
+Muestra gráfica de cuantos son que eligieron 1 de esos 3,
+cuantos eligieron 2 y cuantos eligieron los 3
+"""
 
 fig, ax = plt.subplots(figsize=(10, 8))
 

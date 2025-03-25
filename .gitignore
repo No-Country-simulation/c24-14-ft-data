@@ -121,7 +121,5 @@ cython_debug/
 *.pdf
 *.docx
 *.pptx
-*.ipynb
-
 # Miscellaneous
 /.luarc.json
